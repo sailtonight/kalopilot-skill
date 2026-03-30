@@ -47,8 +47,7 @@ The skill supports multi-turn conversations — ask follow-up questions and it r
 
 ## Requirements
 
-- A [KaloData](https://kalodata.com) account with credits
-- Claude Code, Claude Desktop, or Claude.ai
+- A [KaloData](https://kalodata.com) API token
 
 ## License
 
