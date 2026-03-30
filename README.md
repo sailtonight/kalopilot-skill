@@ -17,14 +17,8 @@ Supports all TikTok Shop regions: US, UK, ID, TH, VN, PH, MY, SG, MX, BR, JP, an
 
 ## Installation
 
-Copy the `kalopilot/` folder into your Claude skills directory:
-
 ```bash
-# Claude Code
-cp -r kalopilot/ .claude/skills/kalopilot/
-
-# Or globally
-cp -r kalopilot/ ~/.claude/skills/kalopilot/
+npx skills add https://github.com/sailtonight/kalopilot-skill --skill kalopilot
 ```
 
 ## Setup
