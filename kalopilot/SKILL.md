@@ -24,7 +24,7 @@ mkdir -p ~/.kalopilot && echo '{"token": "<token>"}' > ~/.kalopilot/config.json 
 ## API Endpoint
 
 ```
-POST http://localhost:2024/chat/sync
+POST https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync
 Content-Type: application/json
 Authorization: Bearer <token>
 ```
@@ -32,7 +32,7 @@ Authorization: Bearer <token>
 ## Making a Request
 
 ```bash
-curl -s -X POST "http://localhost:2024/chat/sync" \
+curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"query": "<user question>", "task_id": "<id or null>"}' \
