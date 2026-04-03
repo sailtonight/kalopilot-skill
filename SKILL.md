@@ -49,15 +49,25 @@ curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" 
   -H "Authorization: Bearer $TOKEN" \
   -d '{"query": "<user question>", "task_id": "<id or null>"}' \
   --max-time 600 \
-  -o /tmp/kalopilot_result.json 2>/tmp/kalopilot_err.log &
+  -o ~/.kalopilot/result.json 2>~/.kalopilot/err.log &
 echo $!
 ```
 
 Tell the user the query is running.
 
-**Step 2 — Poll for completion:**
+**Step 2 — Early error check (2 seconds after launch):**
 
-Check if the process is still alive. Time your first poll based on query complexity:
+Immediately check if the process died early (auth failure, network error, invalid request):
+
+```bash
+sleep 2 && kill -0 <PID> 2>/dev/null && echo "running" || (echo "early exit"; cat ~/.kalopilot/result.json ~/.kalopilot/err.log 2>/dev/null)
+```
+
+If it exited early, read the output and handle the error (e.g. bad token, network unreachable). Do NOT proceed to polling.
+
+**Step 3 — Poll for completion:**
+
+If the early check shows "running", poll based on query complexity:
 - Simple query → first poll after **45 seconds**
 - Complex query → first poll after **90 seconds**
 - If still running, poll again every **30 seconds**
@@ -66,10 +76,10 @@ Check if the process is still alive. Time your first poll based on query complex
 kill -0 <PID> 2>/dev/null && echo "running" || echo "done"
 ```
 
-**Step 3 — Read result:**
+**Step 4 — Read result:**
 
 ```bash
-cat /tmp/kalopilot_result.json
+cat ~/.kalopilot/result.json
 ```
 
 ### Multi-turn Conversations
