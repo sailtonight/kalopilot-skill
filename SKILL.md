@@ -40,9 +40,10 @@ The API is slow — do NOT run curl in the foreground or you will block and time
 - Complex queries (cross-dimension, diagnostics, comparisons): 2–3 minutes
 - Very complex (multi-step analysis with reports): up to 10 minutes
 
-**Step 1 — Launch in background:**
+**Step 1 — Clean up previous results and launch in background:**
 
 ```bash
+rm -f ~/.kalopilot/result.json ~/.kalopilot/err.log && \
 TOKEN=$(sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' ~/.kalopilot/config.json) && \
 curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
   -H "Content-Type: application/json" \
