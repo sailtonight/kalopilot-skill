@@ -43,7 +43,7 @@ The API is slow — do NOT run curl in the foreground or you will block and time
 **Step 1 — Launch in background:**
 
 ```bash
-TOKEN=$(cat ~/.kalopilot/config.json | grep -o '"token":"[^"]*"' | cut -d'"' -f4) && \
+TOKEN=$(sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' ~/.kalopilot/config.json) && \
 curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
