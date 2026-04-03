@@ -15,11 +15,13 @@ Token is stored in `~/.kalopilot/config.json`:
 {"token": "your-token-here"}
 ```
 
-Read the token before each request. If the file doesn't exist, ask the user for their KaloData token, then save it:
+If the file doesn't exist, ask the user for their KaloData token, then save it:
 
 ```bash
 mkdir -p ~/.kalopilot && echo '{"token": "<token>"}' > ~/.kalopilot/config.json && chmod 600 ~/.kalopilot/config.json
 ```
+
+Token is loaded automatically in the curl command below via inline extraction — no separate read step needed.
 
 ## API Endpoint
 
@@ -41,6 +43,7 @@ The API is slow — do NOT run curl in the foreground or you will block and time
 **Step 1 — Launch in background:**
 
 ```bash
+TOKEN=$(cat ~/.kalopilot/config.json | grep -o '"token":"[^"]*"' | cut -d'"' -f4) && \
 curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
