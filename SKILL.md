@@ -31,6 +31,44 @@ Authorization: Bearer <token>
 
 ## Making a Request
 
+The API typically responds in 2–3 minutes but can take up to 10 minutes for complex queries. Choose the appropriate execution strategy based on your environment:
+
+### Strategy A: Background execution (preferred)
+
+If your shell tool supports background execution with async notification (e.g. Bash tool's `run_in_background: true`), use this approach:
+
+1. Launch the curl command in the background with `run_in_background: true` and `timeout: 600000`.
+2. Tell the user the query is running and you'll share results when ready.
+3. Wait for the automatic completion notification — do NOT poll or sleep.
+
+### Strategy B: Foreground execution with polling
+
+If your shell tool does NOT support background execution or async notification:
+
+1. Launch the curl command as a background shell process, writing output to a temp file:
+   ```bash
+   curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $TOKEN" \
+     -d '{"query": "<user question>", "task_id": "<id or null>"}' \
+     --max-time 600 \
+     -o /tmp/kalopilot_result.json 2>/tmp/kalopilot_err.log &
+   echo $!
+   ```
+2. Tell the user the query is running (typically 2–3 min).
+3. Poll every 30 seconds by checking if the process is still alive:
+   ```bash
+   kill -0 <PID> 2>/dev/null && echo "running" || echo "done"
+   ```
+4. Once done, read the result:
+   ```bash
+   cat /tmp/kalopilot_result.json
+   ```
+
+### Curl command
+
+Regardless of strategy, the curl command is the same:
+
 ```bash
 curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
   -H "Content-Type: application/json" \
@@ -39,7 +77,7 @@ curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" 
   --max-time 600
 ```
 
-The request may take up to 10 minutes for complex analytical queries. Always use `--max-time 600`.
+Always set `--max-time 600` on curl. If your shell tool has a timeout parameter, set it to at least 600000 ms (10 minutes).
 
 ### Multi-turn Conversations
 
