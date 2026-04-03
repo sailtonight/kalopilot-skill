@@ -9,19 +9,17 @@ This skill lets you query TikTok Shop data through the KaloPilot AI agent. KaloP
 
 ## Authentication
 
-Token is stored in `~/.kalopilot/config.json`:
+Token is stored as plain text in `~/.kalopilot/token`:
 
-```json
-{"token": "your-token-here"}
+```
+your-token-here
 ```
 
 If the file doesn't exist, ask the user for their KaloData token, then save it:
 
 ```bash
-mkdir -p ~/.kalopilot && echo '{"token": "<token>"}' > ~/.kalopilot/config.json && chmod 600 ~/.kalopilot/config.json
+mkdir -p ~/.kalopilot && echo -n "<token>" > ~/.kalopilot/token && chmod 600 ~/.kalopilot/token
 ```
-
-Token is loaded automatically in the curl command below via inline extraction — no separate read step needed.
 
 ## API Endpoint
 
@@ -44,7 +42,7 @@ The API is slow — do NOT run curl in the foreground or you will block and time
 
 ```bash
 rm -f ~/.kalopilot/result.json ~/.kalopilot/err.log && \
-TOKEN=$(sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' ~/.kalopilot/config.json) && \
+TOKEN=$(cat ~/.kalopilot/token) && \
 curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
