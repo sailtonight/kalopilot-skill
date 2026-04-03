@@ -31,54 +31,46 @@ Authorization: Bearer <token>
 
 ## Making a Request
 
-The API is slow — do NOT run curl in the foreground or you will block and timeout. Always run it as a background process and poll for completion.
+Use `scripts/pilot.sh` to manage queries. The script handles token loading, background execution, early error detection, and result cleanup automatically — preventing stale result issues.
 
 **Response time by complexity:**
 - Simple queries (single-dimension lookup, e.g. "美国热门商品"): ~1 minute
 - Complex queries (cross-dimension, diagnostics, comparisons): 2–3 minutes
 - Very complex (multi-step analysis with reports): up to 10 minutes
 
-**Step 1 — Clean up previous results and launch in background:**
+**Step 1 — Send query:**
 
 ```bash
-rm -f ~/.kalopilot/result.json ~/.kalopilot/err.log && \
-TOKEN=$(cat ~/.kalopilot/token) && \
-curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{"query": "<user question>", "task_id": "<id or null>"}' \
-  --max-time 600 \
-  -o ~/.kalopilot/result.json 2>~/.kalopilot/err.log &
-echo $!
+bash <skill-path>/scripts/pilot.sh query "<user question>"
 ```
 
-Tell the user the query is running.
-
-**Step 2 — Early error check (2 seconds after launch):**
-
-Immediately check if the process died early (auth failure, network error, invalid request):
+With task_id for follow-up questions:
 
 ```bash
-sleep 2 && kill -0 <PID> 2>/dev/null && echo "running" || (echo "early exit"; cat ~/.kalopilot/result.json ~/.kalopilot/err.log 2>/dev/null)
+bash <skill-path>/scripts/pilot.sh query "<user question>" "<task_id>"
 ```
 
-If it exited early, read the output and handle the error (e.g. bad token, network unreachable). Do NOT proceed to polling.
+The script launches curl in the background, does a 2-second early error check (catches bad token, network issues), and prints the PID. Tell the user the query is running.
 
-**Step 3 — Poll for completion:**
+**Step 2 — Poll for completion:**
 
-If the early check shows "running", poll based on query complexity:
+Poll based on query complexity:
 - Simple query → first poll after **45 seconds**
 - Complex query → first poll after **90 seconds**
 - If still running, poll again every **30 seconds**
 
 ```bash
-kill -0 <PID> 2>/dev/null && echo "running" || echo "done"
+bash <skill-path>/scripts/pilot.sh status
 ```
 
-**Step 4 — Read result and clean up:**
+Output is `running`, `done`, or `No active query.`
+
+**Step 3 — Read result:**
+
+Only call this after status shows `done`. The script refuses to read while a query is still running, and cleans up after reading — so stale results are never left behind.
 
 ```bash
-cat ~/.kalopilot/result.json && rm -f ~/.kalopilot/result.json ~/.kalopilot/err.log
+bash <skill-path>/scripts/pilot.sh result
 ```
 
 ### Multi-turn Conversations
