@@ -76,10 +76,10 @@ If the early check shows "running", poll based on query complexity:
 kill -0 <PID> 2>/dev/null && echo "running" || echo "done"
 ```
 
-**Step 4 — Read result:**
+**Step 4 — Read result and clean up:**
 
 ```bash
-cat ~/.kalopilot/result.json
+cat ~/.kalopilot/result.json && rm -f ~/.kalopilot/result.json ~/.kalopilot/err.log
 ```
 
 ### Multi-turn Conversations
