@@ -93,6 +93,7 @@ When the user switches to a clearly different topic, start fresh without `task_i
   "message_id": "456",
   "text": "The main analysis text...",
   "report": "# Detailed Report\n\n...",
+  "report_url": "https://staging.kalodata.com/pilot/share/file?task_id=xxx&tool_call_id=xxx",
   "token_usage": {...},
   "credits_consumed": 10
 }
@@ -102,7 +103,8 @@ When the user switches to a clearly different topic, start fresh without `task_i
 
 1. Show the `text` field — this is the primary analysis.
 2. If `report` is not null, display it as well (it's a markdown report with tables and structured data).
-3. Mention credits consumed at the end, e.g. "(consumed 10 credits)".
+3. If `report_url` is not null, show it as a clickable link so the user can open the full report in their browser, e.g. "查看完整报告：https://staging.kalodata.com/pilot/share/file?task_id=xxx&tool_call_id=xxx".
+4. Mention credits consumed at the end, e.g. "(consumed 10 credits)".
 
 ### Error responses
 
