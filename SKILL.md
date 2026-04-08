@@ -103,7 +103,7 @@ When the user switches to a clearly different topic, start fresh without `task_i
 
 1. Show the `text` field — this is the primary analysis.
 2. If `report` is not null, display it as well (it's a markdown report with tables and structured data).
-3. If `report_url` is not null, show it as a clickable link so the user can open the full report in their browser, e.g. "查看完整报告：[链接]".
+3. If `report_url` is not null, show it as a clickable link so the user can open the full report in their browser, e.g. "查看完整报告：[链接]". **CRITICAL: Copy the `report_url` value verbatim from the API response. NEVER construct, guess, or fabricate this URL — the `task_id` and `tool_call_id` parameters in the URL are unique server-generated values that cannot be inferred. If `report_url` is absent or null in the response, do not show any link.**
 4. Mention credits consumed at the end, e.g. "(consumed 10 credits)".
 
 ### Error responses
