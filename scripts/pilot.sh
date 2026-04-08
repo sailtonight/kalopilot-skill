@@ -59,7 +59,7 @@ cmd_query() {
   fi
 
   # Launch in background
-  curl -s -X POST "https://www.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
+  curl -s -X POST "https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $token" \
     -d "$payload" \

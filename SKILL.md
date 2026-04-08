@@ -24,7 +24,7 @@ mkdir -p ~/.kalopilot && echo -n "<token>" > ~/.kalopilot/token && chmod 600 ~/.
 ## API Endpoint
 
 ```
-POST https://www.kalodata.com/api/pilot/skill/ext/v1/chat/sync
+POST https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync
 Content-Type: application/json
 Authorization: Bearer <token>
 ```
