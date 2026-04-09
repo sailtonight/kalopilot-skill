@@ -6,7 +6,7 @@
 |------|-------------|
 | **Video Rankings** | Top videos by revenue, views, engagement (likes, shares, comments), ad ROAS |
 | **Video Detail** | Full metrics for specific videos: revenue trends, view count, engagement breakdown |
-| **Video Script Extraction** | Frame-by-frame script with timeline, camera angles, visuals, and voiceover text. **100 credits/video**, cached 7 days |
+| **Video Script Extraction** | Frame-by-frame script with timeline, camera angles, visuals, and voiceover text. **1 credits/video**, cached 7 days |
 
 ## Ranking Sort Options
 

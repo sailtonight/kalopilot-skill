@@ -41,5 +41,5 @@ Most queries are included in the user's KaloData plan. Two tools have extra per-
 
 | Tool | Cost | Cache |
 |------|------|-------|
-| Video Script Extraction | 100 credits/video | Redis 7 days + S3 |
-| Product Comment Analysis | 100 credits/product | None |
+| Video Script Extraction | 1 credits/video | Redis 7 days + S3 |
+| Product Comment Analysis | 1 credits/product | None |

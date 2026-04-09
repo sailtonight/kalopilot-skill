@@ -7,7 +7,7 @@
 | **Product Rankings** | Top products by revenue, sales, growth, price, commission. Supports filtering by category, shop, creator, video, livestream, price range, affiliate status, delivery type, launch date |
 | **Product Detail** | Full metrics for specific products: revenue trends, sales volume, pricing, creator count, video count |
 | **Selling Point Analysis** | AI-extracted selling points and product attributes with competitor comparison |
-| **Comment Analysis** | Sentiment analysis of user reviews — pain points, satisfaction drivers, key themes. **100 credits/product** |
+| **Comment Analysis** | Sentiment analysis of user reviews — pain points, satisfaction drivers, key themes. **1 credits/product** |
 | **Image Search** | Upload a product photo to find similar products across all regions |
 
 ## Ranking Sort Options
