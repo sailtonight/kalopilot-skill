@@ -23,14 +23,18 @@ npx skills add https://github.com/sailtonight/kalopilot-skill --skill kalopilot
 
 ## Setup
 
-You need a KaloData account with API access. On first use, the skill will ask for your token and save it to `~/.kalopilot/config.json`.
+You need a KaloData account with API access.
 
-Or set it up manually:
+**Where to find your token:** go to [kalodata.com/pilot](https://kalodata.com/pilot), click **Connect OpenClaw** in the bottom-left of the sidebar, and copy the string under **Current Account Token** in the dialog that opens.
+
+On first use, the skill will walk you through this and save the token for you. You don't need to do anything manually.
+
+To set it up by hand instead:
 
 ```bash
 mkdir -p ~/.kalopilot
-echo '{"token": "your-token-here"}' > ~/.kalopilot/config.json
-chmod 600 ~/.kalopilot/config.json
+echo -n "your-token-here" > ~/.kalopilot/token
+chmod 600 ~/.kalopilot/token
 ```
 
 ## Usage

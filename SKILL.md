@@ -9,17 +9,30 @@ This skill lets you query TikTok Shop data through the KaloPilot AI agent. KaloP
 
 ## Authentication
 
-Token is stored as plain text in `~/.kalopilot/token`:
+The token is stored as plain text in `~/.kalopilot/token`. The first request will fail with a clear error if it's missing — that's expected on first use.
 
-```
-your-token-here
-```
+**When the token is missing, don't just say "I need a token." Walk the user through getting one:**
 
-If the file doesn't exist, ask the user for their KaloData token, then save it:
+1. Go to [kalodata.com/pilot](https://kalodata.com/pilot) and log in.
+2. In the bottom-left of the sidebar, click **Connect OpenClaw** ("Skill installation tutorial").
+3. In the **OpenClaw Integration Guide** dialog that opens, copy the string under **Current Account Token** — a long hex string, e.g. `89e7f60c...5be6b9`.
+4. Paste it back here, and you'll save it for them.
+
+Once the user provides the token, save it (this also creates the directory and locks down permissions):
 
 ```bash
 mkdir -p ~/.kalopilot && echo -n "<token>" > ~/.kalopilot/token && chmod 600 ~/.kalopilot/token
 ```
+
+Then confirm it's saved and immediately retry their original question — don't make them ask again.
+
+To check whether a token is already configured before prompting:
+
+```bash
+[ -s ~/.kalopilot/token ] && echo "configured" || echo "missing"
+```
+
+If the user ever reports auth errors (401 / invalid token), the saved token may be stale — guide them through the same steps to grab a fresh **Current Account Token** and overwrite the file with the command above.
 
 ## API Endpoint
 
