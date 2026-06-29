@@ -36,22 +36,28 @@ If the user ever reports auth errors (401 / invalid token), the saved token may 
 
 ## API Endpoint
 
+The skill uses an **async submit + poll** flow. Submitting returns a `task_id`
+immediately; the agent then runs to completion on the server. You poll for the
+result with short requests, so no connection is held open — gateway idle
+timeouts never apply, no matter how long the analysis takes.
+
 ```
-POST https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/sync
-Content-Type: application/json
+POST https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/async/submit
+GET  https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/async/result?task_id=<id>
 Authorization: Bearer <token>
 ```
 
 ## Making a Request
 
-Use `scripts/pilot.sh` to manage queries. The script handles token loading, background execution, early error detection, and result cleanup automatically — preventing stale result issues.
+Use `scripts/pilot.sh` to manage queries. The script handles token loading,
+submitting the task, and polling — no background processes or stale files.
 
 **Response time by complexity:**
 - Simple queries (single-dimension lookup, e.g. "美国热门商品"): ~1 minute
 - Complex queries (cross-dimension, diagnostics, comparisons): 2–3 minutes
-- Very complex (multi-step analysis with reports): up to 10 minutes
+- Very complex (multi-step analysis with reports): several minutes (no upper-bound timeout)
 
-**Step 1 — Send query:**
+**Step 1 — Submit the query:**
 
 ```bash
 bash <skill-path>/scripts/pilot.sh query "<user question>"
@@ -63,28 +69,29 @@ With task_id for follow-up questions:
 bash <skill-path>/scripts/pilot.sh query "<user question>" "<task_id>"
 ```
 
-The script launches curl in the background, does a 2-second early error check (catches bad token, network issues), and prints the PID. Tell the user the query is running.
+This returns a `task_id` immediately (saved for the next step). If credits are
+insufficient or the token is invalid, you get the error here right away. Tell
+the user the analysis is running.
 
-**Step 2 — Poll for completion:**
+**Step 2 — Poll for the result:**
 
 Poll based on query complexity:
 - Simple query → first poll after **45 seconds**
 - Complex query → first poll after **90 seconds**
-- If still running, poll again every **30 seconds**
-
-```bash
-bash <skill-path>/scripts/pilot.sh status
-```
-
-Output is `running`, `done`, or `No active query.`
-
-**Step 3 — Read result:**
-
-Only call this after status shows `done`. The script refuses to read while a query is still running, and cleans up after reading — so stale results are never left behind.
+- While `status` is `running`, poll again every **30 seconds** until it changes
 
 ```bash
 bash <skill-path>/scripts/pilot.sh result
 ```
+
+Each call returns the current state as JSON. Read `data.status`:
+- `running` → still working; wait and poll again.
+- `completed` → the result fields (`text`, `report`, …) are populated; render them.
+- `error` → show `data.error.message`.
+- `cancelled` → the task was cancelled.
+
+`result` polls the same `task_id` from step 1; pass an explicit `task_id` as an
+argument to poll a specific task.
 
 ### Multi-turn Conversations
 
@@ -100,19 +107,42 @@ When the user switches to a clearly different topic, start fresh without `task_i
 
 ## Response Format
 
+All async responses are wrapped in `{ "success", "data", "message", "code" }`.
+The fields you care about live under `data`.
+
+**Submit** (`query`):
+
+```json
+{ "success": true, "data": { "task_id": "abc123", "status": "submitted" } }
+```
+
+**Poll while running** (`result`):
+
+```json
+{ "success": true, "data": { "task_id": "abc123", "status": "running" } }
+```
+
+**Poll once completed** (`result`):
+
 ```json
 {
-  "task_id": "abc123",
-  "message_id": "456",
-  "text": "The main analysis text...",
-  "report": "# Detailed Report\n\n...",
-  "report_url": "https://staging.kalodata.com/...",
-  "token_usage": {...},
-  "credits_consumed": 10
+  "success": true,
+  "data": {
+    "task_id": "abc123",
+    "status": "completed",
+    "message_id": "456",
+    "text": "The main analysis text...",
+    "report": "# Detailed Report\n\n...",
+    "report_url": "https://staging.kalodata.com/...",
+    "token_usage": {...},
+    "credits_consumed": 10
+  }
 }
 ```
 
 ### How to display the response
+
+Only render once `data.status` is `completed`. Then, reading from `data`:
 
 1. Show the `text` field — this is the primary analysis.
 2. If `report` is not null, display it as well (it's a markdown report with tables and structured data).
@@ -121,9 +151,13 @@ When the user switches to a clearly different topic, start fresh without `task_i
 
 ### Error responses
 
-The API returns errors as JSON with a `message` field. Common cases:
+Two shapes:
+- **Request rejected** (e.g. insufficient credits, invalid token — surfaced by `query`): `success` is `false` with a top-level `message` and `code`.
+- **Task failed** (surfaced by `result`): `data.status` is `error` with `data.error.message`.
+
+Common cases:
 - **Insufficient credits**: tell the user they need to top up on KaloData.
-- **Timeout**: suggest the user try a more specific query.
+- **Membership required**: relay the message — some data needs a higher plan.
 - Other errors: show the error message directly.
 
 ## What Users Can Ask
