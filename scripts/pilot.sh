@@ -12,7 +12,7 @@ PILOT_DIR="$HOME/.kalopilot"
 TOKEN_FILE="$PILOT_DIR/token"
 TASK_FILE="$PILOT_DIR/task_id"
 
-BASE_URL="https://staging.kalodata.com/api/pilot/skill/ext/v1"
+BASE_URL="https://www.kalodata.com/api/pilot/skill/ext/v1"
 REQ_TIMEOUT=30  # seconds; submit/result are both short requests
 
 usage() {

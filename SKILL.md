@@ -42,8 +42,8 @@ result with short requests, so no connection is held open — gateway idle
 timeouts never apply, no matter how long the analysis takes.
 
 ```
-POST https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/async/submit
-GET  https://staging.kalodata.com/api/pilot/skill/ext/v1/chat/async/result?task_id=<id>
+POST https://www.kalodata.com/api/pilot/skill/ext/v1/chat/async/submit
+GET  https://www.kalodata.com/api/pilot/skill/ext/v1/chat/async/result?task_id=<id>
 Authorization: Bearer <token>
 ```
 
@@ -133,7 +133,7 @@ The fields you care about live under `data`.
     "message_id": "456",
     "text": "The main analysis text...",
     "report": "# Detailed Report\n\n...",
-    "report_url": "https://staging.kalodata.com/...",
+    "report_url": "https://www.kalodata.com/...",
     "token_usage": {...},
     "credits_consumed": 10
   }
